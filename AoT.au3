@@ -14,6 +14,7 @@
 #include <AutoItConstants.au3>
 #include <TrayConstants.au3>
 #include <GUIConstantsEx.au3>
+#include <WinAPIRes.au3>
 #include "GUIHyperLink.au3"
 Global $aboutgui
 Global $helpgui
@@ -29,14 +30,11 @@ TrayCreateItem("Help")
 TrayItemSetOnEvent(-1,"help")
 TrayCreateItem("Exit")
 TrayItemSetOnEvent(-1, "xit")
-TrayCreateItem("Test Exit")
-TrayItemSetOnEvent(-1, "testClose")
 
 While 1
 WEnd
 
 Func aot()
-   GUISetCursor(3)
    While 1
 	  WinWaitNotActive("AutoIt v3")
 	  WinWaitNotActive("Program Manager")
@@ -50,7 +48,6 @@ Func aot()
 	  WinSetOnTop($txt, "", 1)
 	  WinSetTitle($txt, "", $txt & " - Always on Top")
    EndIf
-   GUISetCursor(2)
 EndFunc
 
 Func about()
@@ -114,7 +111,7 @@ Func closeGUI($selection)
 	  GUIDelete($selection)
 EndFunc
 
-Func testClose()
+Func xit()
    $allWindows = WinList()
    For $i = 1 to $allWindows[0][0]
 	  If StringRight($allWindows[$i][0], 16) = " - Always on Top" Then
@@ -122,9 +119,5 @@ Func testClose()
 		 WinSetTitle($allWindows[$i][0], "", StringTrimRight($allWindows[$i][0], 16))
 	  EndIf
    Next
-   MsgBox(0,"","DONE")
-EndFunc
-
-Func xit()
    Exit
 EndFunc
