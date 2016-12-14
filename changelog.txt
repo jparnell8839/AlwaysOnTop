@@ -1,0 +1,19 @@
+Version 0.2.0
+Release Date: 2016-12-14
+
+* Added "About" option with link to Github site
+* Added "Help" option with instructions
+* Disable Always On Top activated windows on exit
+
+TO IMPLETEMENT:
+
+* "Options" menu
+* Enabling hotkey support in Options
+* Change mouse cursor when waiting for user to grab window
+
+-----------------------------------------
+
+Version 0.1.0
+Release Date: 2016-06-10
+
+*Initial release
