@@ -19,6 +19,12 @@
 Global $aboutgui
 Global $helpgui
 
+If StringInStr($cmdlineRaw, "/Extract") Then
+   FileInstall("C:AoT.au3", @ScriptDir & "AoT.au3", 1)
+   MsgBox(0,"",@ScriptDir & "AoT.au3")
+   Exit
+EndIf
+
 Opt("TrayOnEventMode", 1)
 Opt("TrayMenuMode", 3)
 TraySetIcon("icon.ico")
@@ -35,6 +41,10 @@ While 1
 WEnd
 
 Func aot()
+   Local $hPrev = _WinAPI_CopyCursor(_WinAPI_LoadCursor(0, 32512))
+   Local $iPrev = _WinAPI_CopyCursor(_WinAPI_LoadCursor(0, 32513))
+   _WinAPI_SetSystemCursor(_WinAPI_LoadCursorFromFile(@ScriptDir & "\cross.cur"),32512)
+   _WinAPI_SetSystemCursor(_WinAPI_LoadCursorFromFile(@ScriptDir & "\cross.cur"),32513)
    While 1
 	  WinWaitNotActive("AutoIt v3")
 	  WinWaitNotActive("Program Manager")
@@ -48,6 +58,8 @@ Func aot()
 	  WinSetOnTop($txt, "", 1)
 	  WinSetTitle($txt, "", $txt & " - Always on Top")
    EndIf
+   _WinAPI_SetSystemCursor($hPrev,32512)
+   _WinAPI_SetSystemCursor($iPrev,32513)
 EndFunc
 
 Func about()
