@@ -2,25 +2,18 @@
 using System;
 using System.IO;
 using System.Reflection;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace AlwaysOnTop
 {
 	public partial class AlwaysOnTop : Form
 	{
-		public const string version = "0.3.1";
-		public const string build = "161230.2047";
-
+		public const string version = "0.4.0";
+		public const string build = "161231.1718";		
+		
 		public AlwaysOnTop()
 		{
 			InitializeComponent();
@@ -34,6 +27,8 @@ namespace AlwaysOnTop
 
 	public class MyCustomApplicationContext : ApplicationContext
 	{
+		
+
 		/*********** ICON DEPENDENCIES *********************/
 		[DllImport("user32.dll")]
 		static extern bool SetSystemCursor(IntPtr hcur, uint id);
@@ -58,14 +53,47 @@ namespace AlwaysOnTop
 
 		public MyCustomApplicationContext()
 		{
+			string AoTPath = Application.ExecutablePath.ToString();
+			
+
 			Assembly _assembly = Assembly.GetExecutingAssembly();
 			Stream iconStream = _assembly.GetManifestResourceStream("AlwaysOnTop.icon.ico");
+			try
+			{
+				using (RegistryKey rkAoTSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+				{
+					if (rkAoTSettings == null)
+					{
+						string AoTInstallPathKey = "Installation Path";
+						string RunAtLogin = "Run at Login";
+						string UseHotKey = "Use Hot Key";
+						string Hotkey = "Hotkey";
+						string Context = "Use Context Menu";
+						Registry.CurrentUser.CreateSubKey(@"SOFTWARE\AlwaysOnTop", RegistryKeyPermissionCheck.ReadWriteSubTree);
+						RegistryKey rkAoTSettings2 = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true);
+						rkAoTSettings2.SetValue(AoTInstallPathKey, AoTPath, RegistryValueKind.String);
+						rkAoTSettings2.SetValue(RunAtLogin, 0, RegistryValueKind.DWord);
+						rkAoTSettings2.SetValue(UseHotKey, 0, RegistryValueKind.DWord);
+						rkAoTSettings2.SetValue(Context, 0, RegistryValueKind.DWord);
+						rkAoTSettings2.SetValue(Hotkey, "", RegistryValueKind.String);
+					}
+				}
+				
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.ToString());
+				Xit(this,null);
+			}
+			
+
 			// Initialize Tray Icon
 			trayIcon = new NotifyIcon()
 			{
 				Icon = new Icon(iconStream),
 				ContextMenu = new ContextMenu(new MenuItem[] {
 					new MenuItem("AlwaysOnTop", AoT),
+					new MenuItem("Settings", Settings),
 					new MenuItem("Help", HelpBox),
 					new MenuItem("About", AboutBox),
 					new MenuItem("Exit", Xit)
@@ -126,6 +154,12 @@ namespace AlwaysOnTop
 			SystemParametersInfo(0x0057, 0, null, 0);
 		} // RevertCursors()
 
+		public static void Settings(object sender, EventArgs e)
+		{
+			FormSettings settings = new FormSettings();
+			settings.ShowDialog();
+		}
+
 		void HelpBox(object sender, EventArgs e)
 		{
 			FormHelp help = new FormHelp();
@@ -142,8 +176,23 @@ namespace AlwaysOnTop
 		{
 			// Hide tray icon, otherwise it will remain shown until user mouses over it
 			trayIcon.Visible = false;
-
 			Application.Exit();
 		} // Xit()
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
 	}
+
+	
 }
