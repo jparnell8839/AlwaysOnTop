@@ -1,5 +1,7 @@
 ﻿using AlwaysOnTop.Classes;
 using System;
+using System.IO;
+using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,8 +18,8 @@ namespace AlwaysOnTop
 {
 	public partial class AlwaysOnTop : Form
 	{
-		public const string version = "0.3.0";
-		public const string build = "161230.0220";
+		public const string version = "0.3.1";
+		public const string build = "161230.2047";
 
 		public AlwaysOnTop()
 		{
@@ -56,10 +58,12 @@ namespace AlwaysOnTop
 
 		public MyCustomApplicationContext()
 		{
+			Assembly _assembly = Assembly.GetExecutingAssembly();
+			Stream iconStream = _assembly.GetManifestResourceStream("AlwaysOnTop.icon.ico");
 			// Initialize Tray Icon
 			trayIcon = new NotifyIcon()
 			{
-				Icon = new Icon("icon.ico"),
+				Icon = new Icon(iconStream),
 				ContextMenu = new ContextMenu(new MenuItem[] {
 					new MenuItem("AlwaysOnTop", AoT),
 					new MenuItem("Help", HelpBox),

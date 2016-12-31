@@ -2,8 +2,8 @@
  *	AlwaysOnTop
  *	Code:		Joshua Parnell
  *	Site:		https://github.com/jparnell8839/AlwaysOnTop
- *	Version:	0.3.0
- *	Build:		161230.0220
+ *	Version:	0.3.1
+ *	Build:		161230.2047
  *	Date:		2016-12-30
  *	Credits:	John Parnell for assistance with original AutoIt version's aot() logic
  *				Sayka & dimitris93 for the cursor changing logic
@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -32,10 +33,20 @@ namespace AlwaysOnTop
 		[STAThread]
 		static void Main()
 		{
+			string path = AppDomain.CurrentDomain.BaseDirectory + "\\AoT_Error.log";
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MyCustomApplicationContext());
-
+			try
+			{
+				Application.Run(new MyCustomApplicationContext());
+			}
+			catch(Exception ex)
+			{
+				using (StreamWriter error = new StreamWriter(path, true))
+				{
+					error.WriteLine(DateTime.Now + ": " + ex.Message);
+				}
+			}
 			
 		}
 	}
