@@ -1,3 +1,21 @@
+Version 0.4.2
+Release Date: 2016-01-04
+
+* Added build version to registry
+* Cleaner handling of registry checks on start
+* Added error handling to clicking apply button
+* Updated installer
+	- Exe format
+	- Fancier installer
+
+TO IMPLEMENT:
+
+* Enabling hotkey support in Options
+* Enabling AlwaysOnTop in titlebar context menus
+* Enable persistant windows by title
+
+-----------------------------------------
+
 Version 0.4.0
 Release Date: 2016-12-31
 
@@ -7,7 +25,7 @@ Release Date: 2016-12-31
 * Added installer for consistency
 * Installer - Create shortcut in start menu programs
 
-TO IMPLETEMENT:
+TO IMPLEMENT:
 
 * Enabling hotkey support in Options
 * Enabling AlwaysOnTop in titlebar context menus
@@ -33,7 +51,7 @@ Release Date: 2016-12-30
 * Rebuilt and re-designed in C#
 * Added balloon tip when AlwaysOnTop is running
 
-TO IMPLETEMENT:
+TO IMPLEMENT:
 
 * "Options" menu
 * Enabling hotkey support in Options
@@ -46,7 +64,7 @@ Release Date: 2016-12-14
 
 * Change the mouse cursor when waiting for user to grab window
 
-TO IMPLETEMENT:
+TO IMPLEMENT:
 
 * "Options" menu
 * Enabling hotkey support in Options
@@ -60,7 +78,7 @@ Release Date: 2016-12-14
 * Added "Help" option with instructions
 * Disable Always On Top activated windows on exit
 
-TO IMPLETEMENT:
+TO IMPLEMENT:
 
 * "Options" menu
 * Enabling hotkey support in Options

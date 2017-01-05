@@ -11,8 +11,8 @@ namespace AlwaysOnTop
 {
 	public partial class AlwaysOnTop : Form
 	{
-		public const string version = "0.4.0";
-		public const string build = "161231.1718";		
+		public const string version = "0.4.2";
+		public const string build = "170104.2106";		
 		
 		public AlwaysOnTop()
 		{
@@ -54,31 +54,54 @@ namespace AlwaysOnTop
 		public MyCustomApplicationContext()
 		{
 			string AoTPath = Application.ExecutablePath.ToString();
-			
+			string AoTBuild, IP, HK, PW;
+			int RaL, UHK, CT, UPM;
 
 			Assembly _assembly = Assembly.GetExecutingAssembly();
 			Stream iconStream = _assembly.GetManifestResourceStream("AlwaysOnTop.icon.ico");
+
 			try
 			{
-				using (RegistryKey rkAoTSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+				using (RegistryKey rkSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
 				{
-					if (rkAoTSettings == null)
+					if (rkSettings == null)
 					{
-						string AoTInstallPathKey = "Installation Path";
-						string RunAtLogin = "Run at Login";
-						string UseHotKey = "Use Hot Key";
-						string Hotkey = "Hotkey";
-						string Context = "Use Context Menu";
 						Registry.CurrentUser.CreateSubKey(@"SOFTWARE\AlwaysOnTop", RegistryKeyPermissionCheck.ReadWriteSubTree);
-						RegistryKey rkAoTSettings2 = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true);
-						rkAoTSettings2.SetValue(AoTInstallPathKey, AoTPath, RegistryValueKind.String);
-						rkAoTSettings2.SetValue(RunAtLogin, 0, RegistryValueKind.DWord);
-						rkAoTSettings2.SetValue(UseHotKey, 0, RegistryValueKind.DWord);
-						rkAoTSettings2.SetValue(Context, 0, RegistryValueKind.DWord);
-						rkAoTSettings2.SetValue(Hotkey, "", RegistryValueKind.String);
 					}
 				}
+
+				RegistryKey regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true);
 				
+				AoTBuild = Methods.TryRegString(regSettings, "Build", AlwaysOnTop.build, true);
+				IP = Methods.TryRegString(regSettings, "Installation Path", AoTPath,true);
+				RaL = Methods.TryRegInt(regSettings, "Run at Login", 0,false);
+				UHK = Methods.TryRegInt(regSettings, "Use Hot Key", 0,false);
+				HK = Methods.TryRegString(regSettings, "Hotkey", "",false);
+				CT = Methods.TryRegInt(regSettings, "Use Context Menu", 0,false);
+				UPM = Methods.TryRegInt(regSettings, "Use Permanent Windows", 0,false);
+				PW = Methods.TryRegString(regSettings, "Windows by Title", "",false);
+
+				// Initialize Tray Icon
+				trayIcon = new NotifyIcon()
+				{
+					Icon = new Icon(iconStream),
+					ContextMenu = new ContextMenu(new MenuItem[] 
+					{
+					new MenuItem("AlwaysOnTop", AoT),
+					new MenuItem("Settings", Settings),
+					new MenuItem("Help", HelpBox),
+					new MenuItem("About", AboutBox),
+					new MenuItem("Exit", Xit)
+					}),
+					Visible = true
+				};
+				trayIcon.Click += TrayIcon_Click;
+				trayIcon.ShowBalloonTip(5000, "AlwaysOnTop", "AlwaysOnTop is running in the background.", ToolTipIcon.Info);
+
+				if (CT == 1) { /* call method to enabled titlebar context menu*/ }
+				if (UHK == 1) { /* call method to enabled titlebar context menu*/ }
+				if (UPM == 1) { /* call method to enabled titlebar context menu*/ }
+
 			}
 			catch (Exception ex)
 			{
@@ -87,21 +110,7 @@ namespace AlwaysOnTop
 			}
 			
 
-			// Initialize Tray Icon
-			trayIcon = new NotifyIcon()
-			{
-				Icon = new Icon(iconStream),
-				ContextMenu = new ContextMenu(new MenuItem[] {
-					new MenuItem("AlwaysOnTop", AoT),
-					new MenuItem("Settings", Settings),
-					new MenuItem("Help", HelpBox),
-					new MenuItem("About", AboutBox),
-					new MenuItem("Exit", Xit)
-			}),
-				Visible = true
-			};
-			trayIcon.Click += TrayIcon_Click;
-			trayIcon.ShowBalloonTip(5000, "AlwaysOnTop", "AlwaysOnTop is running in the background.",ToolTipIcon.Info);
+			
 		}
 
 		private void TrayIcon_Click(object sender, EventArgs e) //let left click behave the same as right click

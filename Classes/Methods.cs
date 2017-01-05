@@ -2,6 +2,7 @@
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using Microsoft.Win32;
 
 namespace AlwaysOnTop.Classes
 {
@@ -100,5 +101,58 @@ namespace AlwaysOnTop.Classes
 				}
 			}
 		} // AoT_off()
+
+		public static string TryRegString(RegistryKey rk, string keyName, string value, bool overwrite)
+		{
+			string temp;
+
+			try
+			{
+				temp = (string)rk.GetValue(keyName);
+			}
+			catch
+			{
+				rk.SetValue(keyName, value, RegistryValueKind.String);
+				temp = (string)rk.GetValue(keyName);
+			}
+			if (overwrite == true)
+			{
+				if (temp != value)
+				{
+					rk.SetValue(keyName, value, RegistryValueKind.String);
+					temp = (string)rk.GetValue(keyName);
+				}
+			}
+
+			return temp;
+		}
+
+		public static int TryRegInt(RegistryKey rk, string keyName, int value, bool overwrite)
+		{
+			int temp;
+
+			try
+			{
+				temp = (int)rk.GetValue(keyName);
+			}
+			catch
+			{
+				rk.SetValue(keyName, value, RegistryValueKind.DWord);
+				temp = (int)rk.GetValue(keyName);
+			}
+
+			if(overwrite == true)
+			{
+				if (temp != value)
+				{
+					rk.SetValue(keyName, value, RegistryValueKind.DWord);
+					temp = (int)rk.GetValue(keyName);
+				}
+			}
+			
+			return temp;
+		}
+
+
 	}
 }

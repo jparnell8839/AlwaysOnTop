@@ -38,6 +38,10 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
+			this.chkPermWindows = new System.Windows.Forms.CheckBox();
+			this.listPermWindows = new System.Windows.Forms.ListBox();
+			this.label3 = new System.Windows.Forms.Label();
+			this.btnSelectWindows = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// chkRunAtLogin
@@ -80,6 +84,7 @@
 			this.chkTitleContext.TabIndex = 3;
 			this.chkTitleContext.Text = "Use Title Bar Context Menus";
 			this.chkTitleContext.UseVisualStyleBackColor = true;
+			this.chkTitleContext.CheckedChanged += new System.EventHandler(this.chkTitleContext_CheckedChanged);
 			// 
 			// chkHotKey
 			// 
@@ -90,6 +95,7 @@
 			this.chkHotKey.TabIndex = 4;
 			this.chkHotKey.Text = "Use A Hotkey";
 			this.chkHotKey.UseVisualStyleBackColor = true;
+			this.chkHotKey.CheckedChanged += new System.EventHandler(this.chkHotKey_CheckedChanged);
 			// 
 			// label1
 			// 
@@ -131,11 +137,55 @@
 			this.label8.TabIndex = 20;
 			this.label8.Text = "Copyright © 2013 - 2016 Joshua Parnell";
 			// 
+			// chkPermWindows
+			// 
+			this.chkPermWindows.AutoSize = true;
+			this.chkPermWindows.Location = new System.Drawing.Point(12, 58);
+			this.chkPermWindows.Name = "chkPermWindows";
+			this.chkPermWindows.Size = new System.Drawing.Size(186, 17);
+			this.chkPermWindows.TabIndex = 22;
+			this.chkPermWindows.Text = "Always put these windows on top:";
+			this.chkPermWindows.UseVisualStyleBackColor = true;
+			this.chkPermWindows.CheckedChanged += new System.EventHandler(this.chkPermWindows_CheckedChanged);
+			// 
+			// listPermWindows
+			// 
+			this.listPermWindows.FormattingEnabled = true;
+			this.listPermWindows.Location = new System.Drawing.Point(12, 81);
+			this.listPermWindows.Name = "listPermWindows";
+			this.listPermWindows.Size = new System.Drawing.Size(427, 95);
+			this.listPermWindows.TabIndex = 23;
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.label3.ForeColor = System.Drawing.Color.DarkRed;
+			this.label3.Location = new System.Drawing.Point(204, 59);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(83, 13);
+			this.label3.TabIndex = 24;
+			this.label3.Text = "Coming soon!";
+			// 
+			// btnSelectWindows
+			// 
+			this.btnSelectWindows.Location = new System.Drawing.Point(345, 54);
+			this.btnSelectWindows.Name = "btnSelectWindows";
+			this.btnSelectWindows.Size = new System.Drawing.Size(94, 23);
+			this.btnSelectWindows.TabIndex = 25;
+			this.btnSelectWindows.Text = "Select Windows";
+			this.btnSelectWindows.UseVisualStyleBackColor = true;
+			this.btnSelectWindows.Click += new System.EventHandler(this.btnSelectWindows_Click);
+			// 
 			// FormSettings
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(451, 222);
+			this.Controls.Add(this.btnSelectWindows);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.listPermWindows);
+			this.Controls.Add(this.chkPermWindows);
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.label2);
@@ -166,5 +216,9 @@
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.CheckBox chkPermWindows;
+		private System.Windows.Forms.ListBox listPermWindows;
+		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.Button btnSelectWindows;
 	}
 }
