@@ -34,7 +34,6 @@
 			this.btnApply = new System.Windows.Forms.Button();
 			this.chkTitleContext = new System.Windows.Forms.CheckBox();
 			this.chkHotKey = new System.Windows.Forms.CheckBox();
-			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
@@ -42,6 +41,7 @@
 			this.listPermWindows = new System.Windows.Forms.ListBox();
 			this.label3 = new System.Windows.Forms.Label();
 			this.btnSelectWindows = new System.Windows.Forms.Button();
+			this.btnSetHotkey = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// chkRunAtLogin
@@ -80,9 +80,9 @@
 			this.chkTitleContext.AutoSize = true;
 			this.chkTitleContext.Location = new System.Drawing.Point(197, 12);
 			this.chkTitleContext.Name = "chkTitleContext";
-			this.chkTitleContext.Size = new System.Drawing.Size(161, 17);
+			this.chkTitleContext.Size = new System.Drawing.Size(164, 17);
 			this.chkTitleContext.TabIndex = 3;
-			this.chkTitleContext.Text = "Use Title Bar Context Menus";
+			this.chkTitleContext.Text = "Use Windows System Menus";
 			this.chkTitleContext.UseVisualStyleBackColor = true;
 			this.chkTitleContext.CheckedChanged += new System.EventHandler(this.chkTitleContext_CheckedChanged);
 			// 
@@ -96,17 +96,6 @@
 			this.chkHotKey.Text = "Use A Hotkey";
 			this.chkHotKey.UseVisualStyleBackColor = true;
 			this.chkHotKey.CheckedChanged += new System.EventHandler(this.chkHotKey_CheckedChanged);
-			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label1.ForeColor = System.Drawing.Color.DarkRed;
-			this.label1.Location = new System.Drawing.Point(110, 36);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(83, 13);
-			this.label1.TabIndex = 5;
-			this.label1.Text = "Coming soon!";
 			// 
 			// label2
 			// 
@@ -177,11 +166,22 @@
 			this.btnSelectWindows.UseVisualStyleBackColor = true;
 			this.btnSelectWindows.Click += new System.EventHandler(this.btnSelectWindows_Click);
 			// 
+			// btnSetHotkey
+			// 
+			this.btnSetHotkey.Location = new System.Drawing.Point(110, 31);
+			this.btnSetHotkey.Name = "btnSetHotkey";
+			this.btnSetHotkey.Size = new System.Drawing.Size(75, 23);
+			this.btnSetHotkey.TabIndex = 26;
+			this.btnSetHotkey.Text = "Set Hotkey";
+			this.btnSetHotkey.UseVisualStyleBackColor = true;
+			this.btnSetHotkey.Click += new System.EventHandler(this.btnSetHotkey_Click);
+			// 
 			// FormSettings
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(451, 222);
+			this.Controls.Add(this.btnSetHotkey);
 			this.Controls.Add(this.btnSelectWindows);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.listPermWindows);
@@ -189,7 +189,6 @@
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.label2);
-			this.Controls.Add(this.label1);
 			this.Controls.Add(this.chkHotKey);
 			this.Controls.Add(this.chkTitleContext);
 			this.Controls.Add(this.btnApply);
@@ -212,7 +211,6 @@
 		private System.Windows.Forms.Button btnApply;
 		private System.Windows.Forms.CheckBox chkTitleContext;
 		private System.Windows.Forms.CheckBox chkHotKey;
-		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.Label label8;
@@ -220,5 +218,6 @@
 		private System.Windows.Forms.ListBox listPermWindows;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Button btnSelectWindows;
+		private System.Windows.Forms.Button btnSetHotkey;
 	}
 }

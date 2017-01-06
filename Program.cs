@@ -12,6 +12,10 @@
  *					http://stackoverflow.com/questions/2208690/invoke-notifyicons-context-menu/
  *				Jorge Ferreira for window title logic
  *					http://stackoverflow.com/questions/115868/how-do-i-get-the-title-of-the-current-active-window-using-c
+ *				StormySpike for the use of the globalKeyboardHook class
+ *					https://www.codeproject.com/kb/cs/csllkeyboardhook.aspx
+ *				Jon Egerton for enabling the modifer keys on globalKeyboardHook
+ *					http://www.jonegerton.com/dotnet/determining-the-state-of-modifier-keys-when-hooking-keyboard-input/
  *					
  ********************************************/
 

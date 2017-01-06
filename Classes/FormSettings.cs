@@ -15,6 +15,9 @@ namespace AlwaysOnTop.Classes
 	{
 		
 		string AoTPath = Application.ExecutablePath.ToString();
+		bool MustRestart = false;
+		string HK, PW;
+		int RaL, UHK, CT, UPM;
 
 		public FormSettings()
 		{
@@ -24,15 +27,13 @@ namespace AlwaysOnTop.Classes
 		private void FormSettings_Load(object sender, EventArgs e)
 		{
 			chkTitleContext.Enabled = false;
-			chkHotKey.Enabled = false;
 			chkPermWindows.Enabled = false;
 			btnSelectWindows.Enabled = false;
 			listPermWindows.Enabled = false;
 
 			using (RegistryKey regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
 			{
-				string HK, PW;
-				int RaL, UHK, CT, UPM;
+				
 
 				RaL = Methods.TryRegInt(regSettings, "Run at Login", 0, false);
 				UHK = Methods.TryRegInt(regSettings, "Use Hot Key", 0, false);
@@ -43,7 +44,13 @@ namespace AlwaysOnTop.Classes
 
 				if (RaL == 1) {	chkRunAtLogin.Checked = true; }
 				if (UHK == 1) { chkHotKey.Checked = true; }
-				if (HK != "") { /* - The inputbox (?) for the Hotkey assignment gets populated */ }
+				if (HK != "")
+				{
+					string delim = "+";
+					String[] sHK = HK.Split(new string[] { delim },StringSplitOptions.None);
+					string modifier = sHK[0];
+					string key = sHK[1];
+				}
 				if (CT == 1) { chkTitleContext.Checked = true; }
 				if (UPM == 1) { chkPermWindows.Checked = true; }
 				if (PW != "") { /* - The listbox for the permanent AoT windows gets populated */ }
@@ -106,7 +113,7 @@ namespace AlwaysOnTop.Classes
 					}
 					catch(Exception ex)
 					{
-						MessageBox.Show("ERROR", "An error occurred." + Environment.NewLine + ex.Message, MessageBoxButtons.OK, MessageBoxIcon.Error);
+						MessageBox.Show("An error occurred." + Environment.NewLine + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 
 					#endregion
@@ -127,7 +134,7 @@ namespace AlwaysOnTop.Classes
 					}
 					catch(Exception ex)
 					{
-						MessageBox.Show("ERROR", "An error occurred." + Environment.NewLine + ex.Message,MessageBoxButtons.OK,MessageBoxIcon.Error);
+						MessageBox.Show("An error occurred." + Environment.NewLine + ex.Message, "ERROR", MessageBoxButtons.OK,MessageBoxIcon.Error);
 					}
 
 
@@ -138,16 +145,18 @@ namespace AlwaysOnTop.Classes
 					{
 						if (chkHotKey.Checked)
 						{
-
+							Methods.TryRegInt(regSettings, "Use Hot Key", 1, true);
+							MustRestart = true;
 						}
 						else
 						{
-
+							Methods.TryRegInt(regSettings, "Use Hot Key", 0, true);
+							MustRestart = true;
 						}
 					}
 					catch (Exception ex)
 					{
-						MessageBox.Show("ERROR", "An error occurred." + Environment.NewLine + ex.Message, MessageBoxButtons.OK, MessageBoxIcon.Error);
+						MessageBox.Show("An error occurred." + Environment.NewLine + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 
 
@@ -168,20 +177,38 @@ namespace AlwaysOnTop.Classes
 					}
 					catch (Exception ex)
 					{
-						MessageBox.Show("ERROR", "An error occurred." + Environment.NewLine + ex.Message, MessageBoxButtons.OK, MessageBoxIcon.Error);
+						MessageBox.Show("An error occurred." + Environment.NewLine + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 
 					#endregion
 				}
 			}
 
-				
 
+			if (MustRestart)
+			{
+				DialogResult restart = MessageBox.Show("You must restart AlwaysOnTop to apply these settings." + Environment.NewLine + "Restart now?", "Attention", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+				switch (restart)
+				{
+					case DialogResult.Yes:
+						Application.Restart();
+						break;
+					case DialogResult.No:
+						break;
+					default:
+						break;
+				}
+			}
 
 
 			btnApply.Enabled = false;
 		}
 
-		
+		private void btnSetHotkey_Click(object sender, EventArgs e)
+		{
+			btnApply.Enabled = true;
+			FormSetHotkey setHotKey = new FormSetHotkey();
+			setHotKey.ShowDialog();
+		}
 	}
 }

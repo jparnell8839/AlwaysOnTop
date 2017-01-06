@@ -6,13 +6,18 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using Utilities;
+using System.ComponentModel;
 
 namespace AlwaysOnTop
 {
+
+	
+
 	public partial class AlwaysOnTop : Form
 	{
-		public const string version = "0.4.2";
-		public const string build = "170104.2106";		
+		public const string version = "0.5.0";
+		public const string build = "170106.1021";
 		
 		public AlwaysOnTop()
 		{
@@ -21,14 +26,22 @@ namespace AlwaysOnTop
 
 		private void AlwaysOnTop_Load(object sender, EventArgs e)
 		{
-			
+
 		}
+
 	}
 
 	public class MyCustomApplicationContext : ApplicationContext
 	{
-		
 
+		enum KeyModifier
+		{
+			None = 0,
+			Alt = 1,
+			Control = 2,
+			Shift = 4,
+			WinKey = 8
+		}
 		/*********** ICON DEPENDENCIES *********************/
 		[DllImport("user32.dll")]
 		static extern bool SetSystemCursor(IntPtr hcur, uint id);
@@ -47,16 +60,19 @@ namespace AlwaysOnTop
 		public static uint NORMAL = 32512;
 		public static uint IBEAM = 32513;
 		/********** END ICON DEPENDENCIES *******************/
-
 		// declare the trayicon
-		private NotifyIcon trayIcon;
+		NotifyIcon trayIcon;
+
+		public string skey;
+		public Keys kMod, key;
+		globalKeyboardHook gkh;
 
 		public MyCustomApplicationContext()
 		{
 			string AoTPath = Application.ExecutablePath.ToString();
 			string AoTBuild, IP, HK, PW;
 			int RaL, UHK, CT, UPM;
-
+			
 			Assembly _assembly = Assembly.GetExecutingAssembly();
 			Stream iconStream = _assembly.GetManifestResourceStream("AlwaysOnTop.icon.ico");
 
@@ -99,7 +115,43 @@ namespace AlwaysOnTop
 				trayIcon.ShowBalloonTip(5000, "AlwaysOnTop", "AlwaysOnTop is running in the background.", ToolTipIcon.Info);
 
 				if (CT == 1) { /* call method to enabled titlebar context menu*/ }
-				if (UHK == 1) { /* call method to enabled titlebar context menu*/ }
+				if (UHK == 1 && HK != "")
+				{
+					string delim = "+";
+					String[] sHK = HK.Split(new string[] { delim }, StringSplitOptions.None);
+					string modifier = sHK[0];
+					skey = sHK[1];
+					kMod = new Keys();
+
+					switch (modifier.ToLower())
+					{
+						case "ctrl":
+							kMod = Keys.Control;
+							break;
+						case "alt":
+							kMod = Keys.Alt;
+							break;
+						case "shift":
+							kMod = Keys.Shift;
+							break;
+						case "winkey":
+							kMod = Keys.LWin;
+							break;
+						default:
+							kMod = Keys.None;
+							break;
+					}
+
+					TypeConverter keysConverter = TypeDescriptor.GetConverter(typeof(Keys));
+					key = (Keys)keysConverter.ConvertFromString(skey);
+					gkh = new globalKeyboardHook();
+					gkh.HookedKeys.Add(kMod);
+					gkh.HookedKeys.Add(key);
+
+					gkh.KeyUp += new KeyEventHandler(keyup_hook);
+					gkh.hook();
+                    trayIcon.ShowBalloonTip(500,"Settings",kMod + "+" + key + " Hotkey registered",ToolTipIcon.Info);
+				}
 				if (UPM == 1) { /* call method to enabled titlebar context menu*/ }
 
 			}
@@ -108,10 +160,34 @@ namespace AlwaysOnTop
 				MessageBox.Show(ex.ToString());
 				Xit(this,null);
 			}
-			
-
-			
 		}
+
+		void keyup_hook(object sender, KeyEventArgs e)
+		{
+			if (e.Modifiers == kMod && e.KeyCode == key)
+			{
+				string winTitle = Methods.GetWindowTitle();
+				trayIcon.ShowBalloonTip(500, "AlwaysOnTop", "Running AlwaysOnTop on " + winTitle, ToolTipIcon.Info);
+				string subTitle = "";
+				try { subTitle = winTitle.Substring(winTitle.Length - 14); }
+				catch { }
+
+				bool isOnTop = false;
+				if (subTitle == " - AlwaysOnTop") isOnTop = true;
+				if (isOnTop)
+				{
+					// Disable the AlwaysOnTop
+					Methods.AoT_off(winTitle);
+				}
+				else
+				{
+					// Enable the AlwaysOnTop
+					Methods.AoT_on(winTitle);
+				}
+				e.Handled = true;
+		}
+
+	}
 
 		private void TrayIcon_Click(object sender, EventArgs e) //let left click behave the same as right click
 		{
@@ -185,22 +261,9 @@ namespace AlwaysOnTop
 		{
 			// Hide tray icon, otherwise it will remain shown until user mouses over it
 			trayIcon.Visible = false;
+			gkh.unhook();
 			Application.Exit();
 		} // Xit()
-
-
-		
-
-
-
-
-
-
-
-
-
-
-
 	}
 
 	

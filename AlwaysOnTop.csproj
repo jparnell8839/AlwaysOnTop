@@ -88,6 +88,13 @@
     <Compile Include="Classes\FormSettings.Designer.cs">
       <DependentUpon>FormSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Classes\FormSetHotkey.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Classes\FormSetHotkey.Designer.cs">
+      <DependentUpon>FormSetHotkey.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\globalKeyboardHook.cs" />
     <Compile Include="Classes\Methods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -102,6 +109,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Classes\FormSettings.resx">
       <DependentUpon>FormSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Classes\FormSetHotkey.resx">
+      <DependentUpon>FormSetHotkey.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
