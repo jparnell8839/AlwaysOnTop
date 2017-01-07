@@ -42,6 +42,7 @@
 			this.label3 = new System.Windows.Forms.Label();
 			this.btnSelectWindows = new System.Windows.Forms.Button();
 			this.btnSetHotkey = new System.Windows.Forms.Button();
+			this.chkDisableBalloonNotify = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// chkRunAtLogin
@@ -176,11 +177,23 @@
 			this.btnSetHotkey.UseVisualStyleBackColor = true;
 			this.btnSetHotkey.Click += new System.EventHandler(this.btnSetHotkey_Click);
 			// 
+			// chkDisableBalloonNotify
+			// 
+			this.chkDisableBalloonNotify.AutoSize = true;
+			this.chkDisableBalloonNotify.Location = new System.Drawing.Point(197, 35);
+			this.chkDisableBalloonNotify.Name = "chkDisableBalloonNotify";
+			this.chkDisableBalloonNotify.Size = new System.Drawing.Size(178, 17);
+			this.chkDisableBalloonNotify.TabIndex = 27;
+			this.chkDisableBalloonNotify.Text = "Disable Balloon Tip Notifications";
+			this.chkDisableBalloonNotify.UseVisualStyleBackColor = true;
+			this.chkDisableBalloonNotify.CheckedChanged += new System.EventHandler(this.chkDisableBalloonNotify_CheckedChanged);
+			// 
 			// FormSettings
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(451, 222);
+			this.Controls.Add(this.chkDisableBalloonNotify);
 			this.Controls.Add(this.btnSetHotkey);
 			this.Controls.Add(this.btnSelectWindows);
 			this.Controls.Add(this.label3);
@@ -219,5 +232,6 @@
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Button btnSelectWindows;
 		private System.Windows.Forms.Button btnSetHotkey;
+		private System.Windows.Forms.CheckBox chkDisableBalloonNotify;
 	}
 }

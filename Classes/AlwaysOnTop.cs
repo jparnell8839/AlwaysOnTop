@@ -16,8 +16,8 @@ namespace AlwaysOnTop
 
 	public partial class AlwaysOnTop : Form
 	{
-		public const string version = "0.5.0";
-		public const string build = "170106.1021";
+		public const string version = "0.5.1";
+		public const string build = "170106.2235";
 		
 		public AlwaysOnTop()
 		{
@@ -67,17 +67,16 @@ namespace AlwaysOnTop
 		public Keys kMod, key;
 		globalKeyboardHook gkh;
 
+		string AoTPath = Application.ExecutablePath.ToString();
+		string AoTBuild, IP, HK, PW;
+		int RaL, UHK, CT, UPM, DBN;
+
 		public MyCustomApplicationContext()
-		{
-			string AoTPath = Application.ExecutablePath.ToString();
-			string AoTBuild, IP, HK, PW;
-			int RaL, UHK, CT, UPM;
-			
+		{			
 			Assembly _assembly = Assembly.GetExecutingAssembly();
 			Stream iconStream = _assembly.GetManifestResourceStream("AlwaysOnTop.icon.ico");
 
-			try
-			{
+			
 				using (RegistryKey rkSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
 				{
 					if (rkSettings == null)
@@ -96,7 +95,9 @@ namespace AlwaysOnTop
 				CT = Methods.TryRegInt(regSettings, "Use Context Menu", 0,false);
 				UPM = Methods.TryRegInt(regSettings, "Use Permanent Windows", 0,false);
 				PW = Methods.TryRegString(regSettings, "Windows by Title", "",false);
-
+				DBN = Methods.TryRegInt(regSettings, "Disable Balloon Notify", 0, false);
+			try
+			{
 				// Initialize Tray Icon
 				trayIcon = new NotifyIcon()
 				{
@@ -112,7 +113,12 @@ namespace AlwaysOnTop
 					Visible = true
 				};
 				trayIcon.Click += TrayIcon_Click;
-				trayIcon.ShowBalloonTip(5000, "AlwaysOnTop", "AlwaysOnTop is running in the background.", ToolTipIcon.Info);
+
+				if (DBN != 1)
+				{
+					trayIcon.ShowBalloonTip(5000, "AlwaysOnTop", "AlwaysOnTop is running in the background.", ToolTipIcon.Info);
+				}
+				
 
 				if (CT == 1) { /* call method to enabled titlebar context menu*/ }
 				if (UHK == 1 && HK != "")
@@ -150,7 +156,11 @@ namespace AlwaysOnTop
 
 					gkh.KeyUp += new KeyEventHandler(keyup_hook);
 					gkh.hook();
-                    trayIcon.ShowBalloonTip(500,"Settings",kMod + "+" + key + " Hotkey registered",ToolTipIcon.Info);
+
+					if (DBN != 1)
+					{
+						trayIcon.ShowBalloonTip(500, "Settings", kMod + "+" + key + " Hotkey registered", ToolTipIcon.Info);
+					}
 				}
 				if (UPM == 1) { /* call method to enabled titlebar context menu*/ }
 
@@ -167,7 +177,10 @@ namespace AlwaysOnTop
 			if (e.Modifiers == kMod && e.KeyCode == key)
 			{
 				string winTitle = Methods.GetWindowTitle();
-				trayIcon.ShowBalloonTip(500, "AlwaysOnTop", "Running AlwaysOnTop on " + winTitle, ToolTipIcon.Info);
+				if (DBN != 1)
+				{
+					trayIcon.ShowBalloonTip(500, "AlwaysOnTop", "Running AlwaysOnTop on " + winTitle, ToolTipIcon.Info);
+				}
 				string subTitle = "";
 				try { subTitle = winTitle.Substring(winTitle.Length - 14); }
 				catch { }

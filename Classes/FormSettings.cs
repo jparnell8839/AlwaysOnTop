@@ -17,7 +17,7 @@ namespace AlwaysOnTop.Classes
 		string AoTPath = Application.ExecutablePath.ToString();
 		bool MustRestart = false;
 		string HK, PW;
-		int RaL, UHK, CT, UPM;
+		int RaL, UHK, CT, UPM, DBN;
 
 		public FormSettings()
 		{
@@ -41,6 +41,7 @@ namespace AlwaysOnTop.Classes
 				CT = Methods.TryRegInt(regSettings, "Use Context Menu", 0, false);
 				UPM = Methods.TryRegInt(regSettings, "Use Permanent Windows", 0, false);
 				PW = Methods.TryRegString(regSettings, "Windows by Title", "", false);
+				DBN = Methods.TryRegInt(regSettings, "Disable Balloon Notify", 0, false);
 
 				if (RaL == 1) {	chkRunAtLogin.Checked = true; }
 				if (UHK == 1) { chkHotKey.Checked = true; }
@@ -54,6 +55,7 @@ namespace AlwaysOnTop.Classes
 				if (CT == 1) { chkTitleContext.Checked = true; }
 				if (UPM == 1) { chkPermWindows.Checked = true; }
 				if (PW != "") { /* - The listbox for the permanent AoT windows gets populated */ }
+				if (DBN == 1) { chkDisableBalloonNotify.Checked = true; }
 			}
 
 
@@ -77,6 +79,11 @@ namespace AlwaysOnTop.Classes
 		}
 
 		private void chkPermWindows_CheckedChanged(object sender, EventArgs e)
+		{
+			btnApply.Enabled = true;
+		}
+
+		private void chkDisableBalloonNotify_CheckedChanged(object sender, EventArgs e)
 		{
 			btnApply.Enabled = true;
 		}
@@ -174,6 +181,28 @@ namespace AlwaysOnTop.Classes
 
 						}
 						
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show("An error occurred." + Environment.NewLine + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+					}
+
+					#endregion
+
+					#region chkDisableBalloonNotify
+					try
+					{
+						if (chkDisableBalloonNotify.Checked)
+						{
+							Methods.TryRegInt(regSettings, "Disable Balloon Notify", 1, true);
+							MustRestart = true;
+						}
+						else
+						{
+							Methods.TryRegInt(regSettings, "Disable Balloon Notify", 0, false);
+							MustRestart = true;
+						}
+
 					}
 					catch (Exception ex)
 					{
