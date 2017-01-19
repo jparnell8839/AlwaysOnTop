@@ -27,10 +27,5 @@ namespace AlwaysOnTop.Classes
 		{
 			System.Diagnostics.Process.Start("https://github.com/jparnell8839/AlwaysOnTop");
 		}
-
-        private void btnCheckUpdate_Click(object sender, EventArgs e)
-        {
-            Methods.GetReleases();
-        }
-    }
+	}
 }
