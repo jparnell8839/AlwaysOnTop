@@ -39,7 +39,6 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "AlwaysOnTop";
 			this.Text = "AlwaysOnTop";
-			this.Load += new System.EventHandler(this.AlwaysOnTop_Load);
 			this.ResumeLayout(false);
 
 		}

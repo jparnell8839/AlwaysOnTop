@@ -1,3 +1,24 @@
+Version 0.6.0
+Release Date: 2016-01-18
+
+ENHANCEMENTS
+
+* Enabled update checking
+* Enabled "Check for updates at start" in settings
+
+BUG FIXES
+
+* Fixed unhandled exception when opening settings where registry key did not exist - ISSUE #11
+* Fixed unhandled exception when exiting application from context menu when hotkey was not registered - ISSUE #11
+
+TO IMPLEMENT:
+
+* Enabling AlwaysOnTop in system wide shell context menus
+* Enable persistant windows by title
+* Enable "Check for update at interval" in Settings
+
+-----------------------------------------
+
 Version 0.5.0
 Release Date: 2016-01-06
 

@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using Utilities;
 using System.ComponentModel;
+using System.Threading;
 
 namespace AlwaysOnTop
 {
@@ -16,32 +17,31 @@ namespace AlwaysOnTop
 
 	public partial class AlwaysOnTop : Form
 	{
-		public const string version = "0.5.1";
-		public const string build = "170106.2235";
+		public const string version = "0.6.0";
+		public const string build = "170118.2018";
 		
 		public AlwaysOnTop()
 		{
 			InitializeComponent();
 		}
 
-		private void AlwaysOnTop_Load(object sender, EventArgs e)
-		{
+		//private void AlwaysOnTop_Load(object sender, EventArgs e)
+		//{
 
-		}
+		//}
 
 	}
 
 	public class MyCustomApplicationContext : ApplicationContext
 	{
+        enum UpdateFrequency
+        {
+            None = 0,
+            Day = 1,
+            Week = 7,
+            Month = 30
+        }
 
-		enum KeyModifier
-		{
-			None = 0,
-			Alt = 1,
-			Control = 2,
-			Shift = 4,
-			WinKey = 8
-		}
 		/*********** ICON DEPENDENCIES *********************/
 		[DllImport("user32.dll")]
 		static extern bool SetSystemCursor(IntPtr hcur, uint id);
@@ -61,7 +61,6 @@ namespace AlwaysOnTop
 		public static uint IBEAM = 32513;
 		/********** END ICON DEPENDENCIES *******************/
 		// declare the trayicon
-		NotifyIcon trayIcon;
 
 		public string skey;
 		public Keys kMod, key;
@@ -69,58 +68,78 @@ namespace AlwaysOnTop
 
 		string AoTPath = Application.ExecutablePath.ToString();
 		string AoTBuild, IP, HK, PW;
-		int RaL, UHK, CT, UPM, DBN;
+		int RaL, UHK, CT, UPM, DBN, CUaS, UFE, UF;
+        DateTime LU;
+        NotifyIcon trayIcon = new NotifyIcon();
 
-		public MyCustomApplicationContext()
-		{			
-			Assembly _assembly = Assembly.GetExecutingAssembly();
+		public MyCustomApplicationContext(string[] args)
+		{
+            
+
+            
+
+            Assembly _assembly = Assembly.GetExecutingAssembly();
 			Stream iconStream = _assembly.GetManifestResourceStream("AlwaysOnTop.icon.ico");
 
 			
-				using (RegistryKey rkSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+			using (RegistryKey rkSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+			{
+				if (rkSettings == null)
 				{
-					if (rkSettings == null)
-					{
-						Registry.CurrentUser.CreateSubKey(@"SOFTWARE\AlwaysOnTop", RegistryKeyPermissionCheck.ReadWriteSubTree);
-					}
+					Registry.CurrentUser.CreateSubKey(@"SOFTWARE\AlwaysOnTop", RegistryKeyPermissionCheck.ReadWriteSubTree);
 				}
+			}
 
-				RegistryKey regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true);
+			RegistryKey regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true);
 				
-				AoTBuild = Methods.TryRegString(regSettings, "Build", AlwaysOnTop.build, true);
-				IP = Methods.TryRegString(regSettings, "Installation Path", AoTPath,true);
-				RaL = Methods.TryRegInt(regSettings, "Run at Login", 0,false);
-				UHK = Methods.TryRegInt(regSettings, "Use Hot Key", 0,false);
-				HK = Methods.TryRegString(regSettings, "Hotkey", "",false);
-				CT = Methods.TryRegInt(regSettings, "Use Context Menu", 0,false);
-				UPM = Methods.TryRegInt(regSettings, "Use Permanent Windows", 0,false);
-				PW = Methods.TryRegString(regSettings, "Windows by Title", "",false);
-				DBN = Methods.TryRegInt(regSettings, "Disable Balloon Notify", 0, false);
+			AoTBuild = Methods.TryRegString(regSettings, "Build", AlwaysOnTop.build, true);
+			IP = Methods.TryRegString(regSettings, "Installation Path", AoTPath,true);
+			RaL = Methods.TryRegInt(regSettings, "Run at Login", 0,false);
+			UHK = Methods.TryRegInt(regSettings, "Use Hot Key", 0,false);
+			HK = Methods.TryRegString(regSettings, "Hotkey", "",false);
+			CT = Methods.TryRegInt(regSettings, "Use Context Menu", 0,false);
+			UPM = Methods.TryRegInt(regSettings, "Use Permanent Windows", 0,false);
+			PW = Methods.TryRegString(regSettings, "Windows by Title", "",false);
+			DBN = Methods.TryRegInt(regSettings, "Disable Balloon Notify", 0, false);
+            CUaS = Methods.TryRegInt(regSettings, "Check for Updates at Start", 0, false);
+            UFE = Methods.TryRegInt(regSettings, "Update Frequency Enabled", 0, false);
+            UF = Methods.TryRegInt(regSettings, "Update Frequency", 0, false);
+            try
+            {
+                LU = DateTime.Parse(Methods.TryRegString(regSettings, "Last check for Update", "na", false));
+            }
+            catch (Exception ex)
+            { MessageBox.Show(ex.Message); }
+
+
+            if (CUaS == 1) { Methods.GetReleases(); }
+            /*if (UFE == 1 && UF != 0) { }  ***********************************************************************/
+
+            regSettings.Close();
+
 			try
 			{
-				// Initialize Tray Icon
-				trayIcon = new NotifyIcon()
-				{
-					Icon = new Icon(iconStream),
-					ContextMenu = new ContextMenu(new MenuItem[] 
-					{
-					new MenuItem("AlwaysOnTop", AoT),
-					new MenuItem("Settings", Settings),
-					new MenuItem("Help", HelpBox),
-					new MenuItem("About", AboutBox),
-					new MenuItem("Exit", Xit)
-					}),
-					Visible = true
-				};
-				trayIcon.Click += TrayIcon_Click;
+                // Initialize Tray Icon
+                TrayIcon.Icon = new Icon(iconStream);
+                TrayIcon.ContextMenu = new ContextMenu(new MenuItem[]
+                {
+                    new MenuItem("AlwaysOnTop", AoT),
+                    new MenuItem("Settings", Settings),
+                    new MenuItem("Help", HelpBox),
+                    new MenuItem("About", AboutBox),
+                    new MenuItem("Exit", Xit)
+                });
+                TrayIcon.Visible = true;
 
-				if (DBN != 1)
-				{
-					trayIcon.ShowBalloonTip(5000, "AlwaysOnTop", "AlwaysOnTop is running in the background.", ToolTipIcon.Info);
-				}
-				
+                TrayIcon.Click += TrayIcon_Click;
 
-				if (CT == 1) { /* call method to enabled titlebar context menu*/ }
+                if (DBN != 1)
+                {
+                    TrayIcon.ShowBalloonTip(5000, "AlwaysOnTop", "AlwaysOnTop is running in the background.", ToolTipIcon.Info);
+                }
+
+
+                if (CT == 1) { /* call method to enabled titlebar context menu*/ }
 				if (UHK == 1 && HK != "")
 				{
 					string delim = "+";
@@ -150,18 +169,22 @@ namespace AlwaysOnTop
 
 					TypeConverter keysConverter = TypeDescriptor.GetConverter(typeof(Keys));
 					key = (Keys)keysConverter.ConvertFromString(skey);
-					gkh = new globalKeyboardHook();
-					gkh.HookedKeys.Add(kMod);
-					gkh.HookedKeys.Add(key);
+					GKH = new globalKeyboardHook();
+					GKH.HookedKeys.Add(kMod);
+					GKH.HookedKeys.Add(key);
 
-					gkh.KeyUp += new KeyEventHandler(keyup_hook);
-					gkh.hook();
+					GKH.KeyUp += new KeyEventHandler(keyup_hook);
+					GKH.hook();
 
 					if (DBN != 1)
 					{
-						trayIcon.ShowBalloonTip(500, "Settings", kMod + "+" + key + " Hotkey registered", ToolTipIcon.Info);
+						TrayIcon.ShowBalloonTip(500, "Settings", kMod + "+" + key + " Hotkey registered", ToolTipIcon.Info);
 					}
 				}
+                else
+                {
+                    gkh = new globalKeyboardHook();
+                }
 				if (UPM == 1) { /* call method to enabled titlebar context menu*/ }
 
 			}
@@ -170,9 +193,23 @@ namespace AlwaysOnTop
 				MessageBox.Show(ex.ToString());
 				Xit(this,null);
 			}
-		}
 
-		void keyup_hook(object sender, KeyEventArgs e)
+            Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
+        }
+
+        public NotifyIcon TrayIcon
+        {
+            get { return trayIcon; }
+            set { trayIcon = value; }
+        }
+
+        globalKeyboardHook GKH
+        {
+            get { return gkh; }
+            set { gkh = value; }
+        }
+
+        void keyup_hook(object sender, KeyEventArgs e)
 		{
 			if (e.Modifiers == kMod && e.KeyCode == key)
 			{
@@ -221,7 +258,7 @@ namespace AlwaysOnTop
 			try { subTitle = winTitle.Substring(winTitle.Length - 14); }
 			catch (Exception ex)
 			{
-				//trayIcon.ShowBalloonTip(5000, "AlwaysOnTop", ex.Message, ToolTipIcon.Error);
+                MessageBox.Show(ex.ToString(), "An error occurred", MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 
 			bool isOnTop = false;
@@ -254,8 +291,8 @@ namespace AlwaysOnTop
 
 		public static void Settings(object sender, EventArgs e)
 		{
-			FormSettings settings = new FormSettings();
-			settings.ShowDialog();
+            FormSettings settings = new FormSettings();
+            settings.ShowDialog();
 		}
 
 		void HelpBox(object sender, EventArgs e)
@@ -270,12 +307,15 @@ namespace AlwaysOnTop
 			about.ShowDialog();
 		} // AboutBox()
 
-		void Xit(object sender, EventArgs e)
+        private void OnApplicationExit(object sender, EventArgs e)
+        {
+            TrayIcon.Visible = false;
+            GKH.unhook();
+        }
+
+		public void Xit(object sender, EventArgs e)
 		{
-			// Hide tray icon, otherwise it will remain shown until user mouses over it
-			trayIcon.Visible = false;
-			gkh.unhook();
-			Application.Exit();
+            Application.Exit();
 		} // Xit()
 	}
 
