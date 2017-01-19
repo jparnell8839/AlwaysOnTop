@@ -2,9 +2,9 @@
  *	AlwaysOnTop
  *	Code:		Joshua Parnell
  *	Site:		https://github.com/jparnell8839/AlwaysOnTop
- *	Version:	0.3.1
- *	Build:		161230.2047
- *	Date:		2016-12-30
+ *	Version:	0.5.2
+ *	Build:		170106.2235
+ *	Date:		2017.01.10
  *	Credits:	John Parnell for assistance with original AutoIt version's aot() logic
  *				Sayka & dimitris93 for the cursor changing logic
  *					http://stackoverflow.com/questions/29781271/setsystemcursor-for-multiple-cursors-behavior
@@ -16,6 +16,8 @@
  *					https://www.codeproject.com/kb/cs/csllkeyboardhook.aspx
  *				Jon Egerton for enabling the modifer keys on globalKeyboardHook
  *					http://www.jonegerton.com/dotnet/determining-the-state-of-modifier-keys-when-hooking-keyboard-input/
+ *				Octokit for the GitHub API classes and updating
+ *				    https://github.com/octokit/octokit.net
  *					
  ********************************************/
 
@@ -32,14 +34,14 @@ namespace AlwaysOnTop
 		/// </summary>
 		/// 
 		[STAThread]
-		static void Main()
+		static void Main(string[] args)
 		{
 			string path = AppDomain.CurrentDomain.BaseDirectory + "\\AoT_Error.log";
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			try
 			{
-				Application.Run(new MyCustomApplicationContext());
+				Application.Run(new MyCustomApplicationContext(args));
 			}
 			catch(Exception ex)
 			{

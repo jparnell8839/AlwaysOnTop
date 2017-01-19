@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Net;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Microsoft.Win32;
 using Utilities;
 using System.Windows.Forms;
+using Octokit;
+using System.IO;
+using System.Threading;
+using System.ComponentModel;
 
 namespace AlwaysOnTop.Classes
 {
@@ -110,12 +115,12 @@ namespace AlwaysOnTop.Classes
 
 			try
 			{
-				temp = (string)rk.GetValue(keyName);
+                temp = (string)rk.GetValue(keyName);
 			}
 			catch
 			{
-				rk.SetValue(keyName, value, RegistryValueKind.String);
-				temp = (string)rk.GetValue(keyName);
+                rk.SetValue(keyName, value, RegistryValueKind.String);
+                temp = (string)rk.GetValue(keyName);
 			}
 			if (overwrite == true)
 			{
@@ -154,5 +159,95 @@ namespace AlwaysOnTop.Classes
 			
 			return temp;
 		}
-	}
+
+        public static void GetReleases()
+        {
+            try
+            {
+                var client = new GitHubClient(new ProductHeaderValue("AlwaysOnTop-Updater"));
+                var releases = client.Repository.Release.GetAll("jparnell8839", "AlwaysOnTop").Result;
+                Release latest = releases[0];
+                var assets = latest.Assets;
+                
+
+                if (latest.TagName != AlwaysOnTop.version)
+                {
+                    DialogResult downloadUpdate = MessageBox.Show("You have " + AlwaysOnTop.version + " installed." + Environment.NewLine
+                        + "The latest release is " + latest.TagName + Environment.NewLine
+                        + Environment.NewLine
+                        + "Would you like to download the newest update?",
+                        "Update Check",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
+
+                    if(downloadUpdate == DialogResult.Yes)
+                    {
+                        //MessageBox.Show(latest);
+                        FormUpdate update = new FormUpdate(latest);
+                        update.ShowDialog();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("You are up to date!","Update Check",MessageBoxButtons.OK);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+        }
+
+        /*public static void GetReleases(int updateFreq, DateTime lastCheck)
+        {
+            Thread thread = new Thread(() =>
+            {
+                long wut = new int();
+                TimeSpan lol = DateTime.Now - lastCheck;
+                wut = long.Parse(lol.ToString("yyyMMddHHmmss"));
+                try
+                {
+                    var client = new GitHubClient(new ProductHeaderValue("AlwaysOnTop-Updater"));
+                    var releases = client.Repository.Release.GetAll("jparnell8839", "AlwaysOnTop").Result;
+                    Release latest = releases[0];
+                    var assets = latest.Assets;
+
+
+                    if (latest.TagName != AlwaysOnTop.version)
+                    {
+                        DialogResult downloadUpdate = MessageBox.Show("You have " + AlwaysOnTop.version + " installed." + Environment.NewLine
+                            + "The latest release is " + latest.TagName + Environment.NewLine
+                            + Environment.NewLine
+                            + "Would you like to download the newest update?",
+                            "Update Check",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Question);
+
+                        if (downloadUpdate == DialogResult.Yes)
+                        {
+                            //MessageBox.Show(latest);
+                            FormUpdate update = new FormUpdate(latest);
+                            update.ShowDialog();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("You are up to date!", "Update Check", MessageBoxButtons.OK);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            });
+        }
+
+        public static void ThreadComplete(object sender, AsyncCompletedEventArgs e)
+        {
+
+        }*/
+    }
 }
