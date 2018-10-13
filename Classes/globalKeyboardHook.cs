@@ -80,7 +80,7 @@ namespace Utilities {
 		/// Installs the global hook
 		/// </summary>
 		public void hook() {
-			IntPtr hInstance = LoadLibrary("User32");
+			var hInstance = LoadLibrary("User32");
 			hhook = SetWindowsHookEx(WH_KEYBOARD_LL, hookProc, hInstance, 0);
 		}
 
@@ -100,12 +100,12 @@ namespace Utilities {
 		/// <returns></returns>
 		public int hookProc(int code, int wParam, ref keyboardHookStruct lParam) {
 			if (code >= 0) {
-				Keys key = (Keys)lParam.vkCode;
+				var key = (Keys)lParam.vkCode;
 				if (HookedKeys.Contains(key))
                 {
                     // Get Modifiers
                     key = AddModifiers(key);
-					KeyEventArgs kea = new KeyEventArgs(key);
+					var kea = new KeyEventArgs(key);
 					if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && (KeyDown != null)) {
 						KeyDown(this, kea) ;
 					} else if ((wParam == WM_KEYUP || wParam == WM_SYSKEYUP) && (KeyUp != null)) {

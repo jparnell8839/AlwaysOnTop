@@ -6,28 +6,35 @@ namespace AlwaysOnTop.Classes
 {
     public partial class FormSettings : Form
 	{
-        
-		string AoTPath = Application.ExecutablePath.ToString();
+		readonly string AoTPath = Application.ExecutablePath;
 		bool MustRestart = false;
-		string HK, PW, modifier, key;
-        String[] sHK = new string[2];
-        char delim = '+';
+		string HK, PW;
+		string[] sHK = new string[2];
+		const char Delim = '+';
 
-        int RaL, UHK, CT, UPM, DBN, CUaS, UFE, UF;
+		int RaL, UHK, CT, UPM, DBN, CUaS, UFE, UF;
 
+		enum UpdateFrequency
+		{
+			None = 0,
+			Day = 1,
+			Week = 7,
+			Month = 30
+		}
+		
 		public FormSettings()
 		{
             InitializeComponent();
 		}
 
-		private void FormSettings_Load(object sender, EventArgs e)
+		void FormSettings_Load(object sender, EventArgs e)
 		{
 			chkTitleContext.Enabled = false;
 			chkPermWindows.Enabled = false;
 			btnSelectWindows.Enabled = false;
 			listPermWindows.Enabled = false;
 
-			using (RegistryKey regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+			using (var regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
 			{
                 RaL = Methods.TryRegInt(regSettings, "Run at Login", 0, false);
                 UHK = Methods.TryRegInt(regSettings, "Use Hot Key", 0, false);
@@ -45,7 +52,7 @@ namespace AlwaysOnTop.Classes
 
                 if (!String.IsNullOrWhiteSpace(HK))
 				{
-                    sHK = HK.Split(delim);
+                    sHK = HK.Split(Delim);
 				}
                 else
                 {
@@ -53,8 +60,6 @@ namespace AlwaysOnTop.Classes
                     sHK[1] = "";
                 }
 
-                modifier = sHK[0];
-                key = sHK[1];
                 if (CT == 1) { chkTitleContext.Checked = true; }
                 if (UPM == 1) { chkPermWindows.Checked = true; }
                 if (PW != "") { /* - The listbox for the permanent AoT windows gets populated */ }
@@ -136,9 +141,9 @@ namespace AlwaysOnTop.Classes
 
 		private void btnApply_Click(object sender, EventArgs e)
 		{
-			using (RegistryKey regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+			using (var regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
 			{
-				using (RegistryKey regRunAtLogin = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
+				using (var regRunAtLogin = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Run", true))
 				{
 					#region chkRunAtLogin
 					try
@@ -274,25 +279,25 @@ namespace AlwaysOnTop.Classes
                         {
                             if (cmbUpdateFreq.SelectedIndex != 0)
                             {
-                                int freq = new int();
+                                UpdateFrequency freq;
                                 switch (cmbUpdateFreq.SelectedIndex)
                                 {
                                     case 1:
-                                        freq = 1;
+                                        freq = UpdateFrequency.Day;
                                         break;
                                     case 2:
-                                        freq = 7;
+                                        freq = UpdateFrequency.Week;
                                         break;
                                     case 3:
-                                        freq = 30;
+                                        freq = UpdateFrequency.Month;
                                         break;
                                     default:
-                                        freq = 0;
+                                        freq = UpdateFrequency.None;
                                         break;
                                 }
 
                                 Methods.TryRegInt(regSettings, "Update Frequency Enabled", 0, true);
-                                Methods.TryRegInt(regSettings, "Update Frequency", freq, true);
+                                Methods.TryRegInt(regSettings, "Update Frequency", (int)freq, true);
                                 MustRestart = true;
                             }
                             else
@@ -320,7 +325,7 @@ namespace AlwaysOnTop.Classes
 
 			if (MustRestart)
 			{
-				DialogResult restart = MessageBox.Show("You must restart AlwaysOnTop to apply these settings." + Environment.NewLine +
+				var restart = MessageBox.Show("You must restart AlwaysOnTop to apply these settings." + Environment.NewLine +
                     "Restart now?", "Attention", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
 				switch (restart)
 				{
@@ -340,7 +345,7 @@ namespace AlwaysOnTop.Classes
 		private void btnSetHotkey_Click(object sender, EventArgs e)
 		{
 			btnApply.Enabled = true;
-			FormSetHotkey setHotKey = new FormSetHotkey();
+			var setHotKey = new FormSetHotkey();
 			setHotKey.ShowDialog();
 		}
 	}

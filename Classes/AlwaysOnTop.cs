@@ -1,6 +1,5 @@
 ﻿using AlwaysOnTop.Classes;
 using System;
-using System.IO;
 using System.Reflection;
 using System.Drawing;
 using System.Runtime.InteropServices;
@@ -8,7 +7,6 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using Utilities;
 using System.ComponentModel;
-using System.Threading;
 
 namespace AlwaysOnTop
 {
@@ -25,14 +23,6 @@ namespace AlwaysOnTop
 
 	public class MyCustomApplicationContext : ApplicationContext
 	{
-        enum UpdateFrequency
-        {
-            None = 0,
-            Day = 1,
-            Week = 7,
-            Month = 30
-        }
-
 		/*********** ICON DEPENDENCIES *********************/
 		[DllImport("user32.dll")]
 		static extern bool SetSystemCursor(IntPtr hcur, uint id);
@@ -57,18 +47,17 @@ namespace AlwaysOnTop
 		public Keys kMod, key;
 		globalKeyboardHook gkh;
 
-		string AoTPath = Application.ExecutablePath.ToString();
+		string AoTPath = Application.ExecutablePath;
 		string AoTBuild, IP, HK, PW;
 		int RaL, UHK, CT, UPM, DBN, CUaS, UFE, UF;
-        DateTime LU;
-        NotifyIcon trayIcon = new NotifyIcon();
+		NotifyIcon trayIcon = new NotifyIcon();
 
 		public MyCustomApplicationContext(string[] args)
 		{
-            Assembly _assembly = Assembly.GetExecutingAssembly();
-			Stream iconStream = _assembly.GetManifestResourceStream("AlwaysOnTop.icon.ico");
+			var _assembly = Assembly.GetExecutingAssembly();
+			var iconStream = _assembly.GetManifestResourceStream("AlwaysOnTop.icon.ico");
 
-			using (RegistryKey rkSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+			using (var rkSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
 			{
 				if (rkSettings == null)
 				{
@@ -76,7 +65,7 @@ namespace AlwaysOnTop
 				}
 			}
 
-			RegistryKey regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true);
+			var regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true);
 				
 			AoTBuild = Methods.TryRegString(regSettings, "Build", AlwaysOnTop.build, true);
 			IP = Methods.TryRegString(regSettings, "Installation Path", AoTPath,true);
@@ -87,50 +76,50 @@ namespace AlwaysOnTop
 			UPM = Methods.TryRegInt(regSettings, "Use Permanent Windows", 0,false);
 			PW = Methods.TryRegString(regSettings, "Windows by Title", "",false);
 			DBN = Methods.TryRegInt(regSettings, "Disable Balloon Notify", 0, false);
-            CUaS = Methods.TryRegInt(regSettings, "Check for Updates at Start", 0, false);
-            UFE = Methods.TryRegInt(regSettings, "Update Frequency Enabled", 0, false);
-            UF = Methods.TryRegInt(regSettings, "Update Frequency", 0, false);
-            //try
-            //{
-            //    LU = DateTime.Parse(Methods.TryRegString(regSettings, "Last check for Update", "na", false));
-            //}
-            //catch (Exception ex)
-            //{ MessageBox.Show(ex.Message); }
+			CUaS = Methods.TryRegInt(regSettings, "Check for Updates at Start", 0, false);
+			UFE = Methods.TryRegInt(regSettings, "Update Frequency Enabled", 0, false);
+			UF = Methods.TryRegInt(regSettings, "Update Frequency", 0, false);
+			//try
+			//{
+			//    LU = DateTime.Parse(Methods.TryRegString(regSettings, "Last check for Update", "na", false));
+			//}
+			//catch (Exception ex)
+			//{ MessageBox.Show(ex.Message); }
 
 
-            if (CUaS == 1) { Methods.GetReleases(); }
-            /*if (UFE == 1 && UF != 0) { }  ***********************************************************************/
+			if (CUaS == 1) { Methods.GetReleases(); }
+			/*if (UFE == 1 && UF != 0) { }  ***********************************************************************/
 
-            regSettings.Close();
+			regSettings.Close();
 
 			try
 			{
-                // Initialize Tray Icon
-                TrayIcon.Icon = new Icon(iconStream);
-                TrayIcon.ContextMenu = new ContextMenu(new MenuItem[]
-                {
-                    new MenuItem("AlwaysOnTop", AoT),
-                    new MenuItem("Settings", Settings),
-                    new MenuItem("Help", HelpBox),
-                    new MenuItem("About", AboutBox),
-                    new MenuItem("Exit", Xit)
-                });
-                TrayIcon.Visible = true;
+				// Initialize Tray Icon
+				TrayIcon.Icon = new Icon(iconStream);
+				TrayIcon.ContextMenu = new ContextMenu(new MenuItem[]
+				{
+					new MenuItem("AlwaysOnTop", AoT),
+					new MenuItem("Settings", Settings),
+					new MenuItem("Help", HelpBox),
+					new MenuItem("About", AboutBox),
+					new MenuItem("Exit", Exit)
+				});
+				TrayIcon.Visible = true;
 
-                TrayIcon.Click += TrayIcon_Click;
+				TrayIcon.Click += TrayIcon_Click;
 
-                if (DBN != 1)
-                {
-                    TrayIcon.ShowBalloonTip(5000, "AlwaysOnTop", "AlwaysOnTop is running in the background.", ToolTipIcon.Info);
-                }
+				if (DBN != 1)
+				{
+					TrayIcon.ShowBalloonTip(5000, "AlwaysOnTop", "AlwaysOnTop is running in the background.", ToolTipIcon.Info);
+				}
 
 
-                if (CT == 1) { /* call method to enabled titlebar context menu*/ }
+				if (CT == 1) { /* call method to enabled titlebar context menu*/ }
 				if (UHK == 1 && HK != "")
 				{
-					string delim = "+";
-					String[] sHK = HK.Split(new string[] { delim }, StringSplitOptions.None);
-					string modifier = sHK[0];
+					var delim = "+";
+					var sHK = HK.Split(new string[] { delim }, StringSplitOptions.None);
+					var modifier = sHK[0];
 					skey = sHK[1];
 					kMod = new Keys();
 
@@ -153,7 +142,7 @@ namespace AlwaysOnTop
 							break;
 					}
 
-					TypeConverter keysConverter = TypeDescriptor.GetConverter(typeof(Keys));
+					var keysConverter = TypeDescriptor.GetConverter(typeof(Keys));
 					key = (Keys)keysConverter.ConvertFromString(skey);
 					GKH = new globalKeyboardHook();
 					GKH.HookedKeys.Add(kMod);
@@ -167,33 +156,33 @@ namespace AlwaysOnTop
 						TrayIcon.ShowBalloonTip(500, "Settings", kMod + "+" + key + " Hotkey registered", ToolTipIcon.Info);
 					}
 				}
-                else
-                {
-                    gkh = new globalKeyboardHook();
-                }
+				else
+				{
+					gkh = new globalKeyboardHook();
+				}
 				if (UPM == 1) { /* call method to enabled titlebar context menu*/ }
 
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show(ex.ToString());
-				Xit(this,null);
+				Exit(this,null);
 			}
 
-            Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
-        }
+			Application.ApplicationExit += new EventHandler(this.OnApplicationExit);
+		}
 
-        public NotifyIcon TrayIcon
-        {
-            get { return trayIcon; }
-            set { trayIcon = value; }
-        }
+		public NotifyIcon TrayIcon
+		{
+			get { return trayIcon; }
+			set { trayIcon = value; }
+		}
 
-        globalKeyboardHook GKH
-        {
-            get { return gkh; }
-            set { gkh = value; }
-        }
+		globalKeyboardHook GKH
+		{
+			get { return gkh; }
+			set { gkh = value; }
+		}
 
         void keyup_hook(object sender, KeyEventArgs e)
 		{
@@ -225,10 +214,11 @@ namespace AlwaysOnTop
 
 	}
 
-		private void TrayIcon_Click(object sender, EventArgs e) //let left click behave the same as right click
+		void TrayIcon_Click(object sender, EventArgs e)
 		{
-			MethodInfo mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
-			mi.Invoke(trayIcon, null);
+			// Let left click behave the same as right click
+			var mi = typeof(NotifyIcon).GetMethod("ShowContextMenu", BindingFlags.Instance | BindingFlags.NonPublic);
+			mi?.Invoke(trayIcon, null);
 		}
 
 		void AoT(object sender, EventArgs e)
@@ -261,48 +251,50 @@ namespace AlwaysOnTop
 			}
 		}
 
-		public static void ChangeCursors()
+		static void ChangeCursors()
 		{
-			//change normal and ibeam to the cross
-			uint[] Cursors = { NORMAL, IBEAM };
-			for (int i = 0; i < Cursors.Length; i++)
-				SetSystemCursor(CopyIcon(LoadCursor(IntPtr.Zero, (int)CROSS)), Cursors[i]);
-		} // ChangeCursors()
+			// Change normal and ibeam to the cross
+			uint[] cursors = { NORMAL, IBEAM };
+			foreach (var c in cursors)
+			{
+				SetSystemCursor(CopyIcon(LoadCursor(IntPtr.Zero, (int)CROSS)), c);
+			}
+		}
 
 		public static void RevertCursors()
 		{
-			//revert your fuckery, because otherwise it will stay this way
+			// Revert because otherwise it will stay this way
 			SystemParametersInfo(0x0057, 0, null, 0);
-		} // RevertCursors()
+		}
 
-		public static void Settings(object sender, EventArgs e)
+		static void Settings(object sender, EventArgs e)
 		{
-            FormSettings settings = new FormSettings();
-            settings.ShowDialog();
+			var settings = new FormSettings();
+			settings.ShowDialog();
 		}
 
 		void HelpBox(object sender, EventArgs e)
 		{
-			FormHelp help = new FormHelp();
+			var help = new FormHelp();
 			help.ShowDialog();
-		} // HelpBox()
+		}
 
 		void AboutBox(object sender, EventArgs e)
 		{
-			FormAbout about = new FormAbout();
+			var about = new FormAbout();
 			about.ShowDialog();
-		} // AboutBox()
+		}
 
-        private void OnApplicationExit(object sender, EventArgs e)
-        {
-            TrayIcon.Visible = false;
-            GKH.unhook();
-        }
-
-		public void Xit(object sender, EventArgs e)
+		void OnApplicationExit(object sender, EventArgs e)
 		{
-            Application.Exit();
-		} // Xit()
+			TrayIcon.Visible = false;
+			GKH.unhook();
+		}
+
+		void Exit(object sender, EventArgs e)
+		{
+			Application.Exit();
+		}
 	}
 
 	

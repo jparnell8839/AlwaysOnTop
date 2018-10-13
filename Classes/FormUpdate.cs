@@ -36,8 +36,8 @@ namespace AlwaysOnTop.Classes
 
         private void startDownload(string url, string fileName)
         {
-            Thread thread = new Thread(() => {
-                WebClient client = new WebClient();
+            var thread = new Thread(() => {
+                var client = new WebClient();
                 client.DownloadProgressChanged += new DownloadProgressChangedEventHandler(client_DownloadProgressChanged);
                 client.DownloadFileCompleted += new AsyncCompletedEventHandler(client_DownloadFileCompleted);
                 client.DownloadFileAsync(new Uri(url), Path.GetTempPath().ToString() + fileName);
@@ -45,8 +45,8 @@ namespace AlwaysOnTop.Classes
             lblStatus.Text = "Downloading...";
             try
             {
-                string now = DateTime.Now.ToString();
-                using (RegistryKey rkSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+                var now = DateTime.Now.ToString();
+                using (var rkSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
                 {
                     Methods.TryRegString(rkSettings, "Last check for Update", now, true);
                 }
@@ -61,9 +61,9 @@ namespace AlwaysOnTop.Classes
         void client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
             this.BeginInvoke((MethodInvoker)delegate {
-                double bytesIn = double.Parse(e.BytesReceived.ToString());
-                double totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
-                double percentage = bytesIn / totalBytes * 100;
+                var bytesIn = double.Parse(e.BytesReceived.ToString());
+                var totalBytes = double.Parse(e.TotalBytesToReceive.ToString());
+                var percentage = bytesIn / totalBytes * 100;
                 lblDownloaded.Text = e.BytesReceived.ToString();
                 lblDownloadTotal.Text = e.TotalBytesToReceive.ToString();
                 pbDownload.Value = int.Parse(Math.Truncate(percentage).ToString());

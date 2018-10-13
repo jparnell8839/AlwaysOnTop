@@ -13,30 +13,30 @@ namespace AlwaysOnTop.Classes
 			InitializeComponent();
 		}
 
-		private void FormSetHotkey_Load(object sender, EventArgs e)
+		void FormSetHotkey_Load(object sender, EventArgs e)
 		{
-			using (RegistryKey regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+			using (var regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
 			{
 				HK = Methods.TryRegString(regSettings, "Hotkey", "", false);
 				if (HK != "") { txtHotkey.Text = HK; };
 			}
 		}
 
-		private void btnSetKey_Click(object sender, EventArgs e)
+		void btnSetKey_Click(object sender, EventArgs e)
 		{
 			btnSetKey.Enabled = false;
 			txtHotkey.Text = "";
 			hotkey = "";
 		}
 
-		private void SetHotkey_KeyUp(object sender, KeyEventArgs e)
+		void SetHotkey_KeyUp(object sender, KeyEventArgs e)
 		{
 			try
 			{
 				if (e.KeyCode != Keys.Back)
 				{
-					Keys modifierKeys = e.Modifiers;
-					Keys pressedKey = e.KeyData;
+					var modifierKeys = e.Modifiers;
+					var pressedKey = e.KeyData;
 
 					if (modifierKeys != Keys.None && pressedKey != Keys.None)
 					{
@@ -164,9 +164,9 @@ namespace AlwaysOnTop.Classes
 			
 		}
 
-		private void btnApply_Click(object sender, EventArgs e)
+		void btnApply_Click(object sender, EventArgs e)
 		{
-			using (RegistryKey regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
+			using (var regSettings = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\AlwaysOnTop", true))
 			{
 				Methods.TryRegString(regSettings, "Hotkey", hotkey, true);
 			}
@@ -174,7 +174,7 @@ namespace AlwaysOnTop.Classes
 			btnApply.Enabled = false;
 		}
 
-		private void btnClose_Click(object sender, EventArgs e)
+		void btnClose_Click(object sender, EventArgs e)
 		{
 			this.Dispose();
 		}
