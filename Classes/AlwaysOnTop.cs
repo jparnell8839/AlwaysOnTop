@@ -184,35 +184,32 @@ namespace AlwaysOnTop
 			set { gkh = value; }
 		}
 
-        void keyup_hook(object sender, KeyEventArgs e)
+		void keyup_hook(object sender, KeyEventArgs e)
 		{
-			if (e.Modifiers == kMod && e.KeyCode == key)
+			if (e.Modifiers != kMod || e.KeyCode != key)
 			{
-				string winTitle = Methods.GetWindowTitle();
-				if (DBN != 1)
-				{
-					trayIcon.ShowBalloonTip(500, "AlwaysOnTop", "Running AlwaysOnTop on " + winTitle, ToolTipIcon.Info);
-				}
-				string subTitle = "";
-				try { subTitle = winTitle.Substring(winTitle.Length - 14); }
-				catch { }
+				return;
+			}
 
-				bool isOnTop = false;
-				if (subTitle == " - AlwaysOnTop") isOnTop = true;
-				if (isOnTop)
-				{
-					// Disable the AlwaysOnTop
-					Methods.AoT_off(winTitle);
-				}
-				else
-				{
-					// Enable the AlwaysOnTop
-					Methods.AoT_on(winTitle);
-				}
-				e.Handled = true;
+			var winTitle = Methods.GetWindowTitle();
+			if (DBN != 1)
+			{
+				trayIcon.ShowBalloonTip(500, "AlwaysOnTop", "Running AlwaysOnTop on " + winTitle, ToolTipIcon.Info);
+			}
+
+			var isOnTop = winTitle?.EndsWith(" - AlwaysOnTop") ?? false; 
+			if (isOnTop)
+			{
+				// Disable the AlwaysOnTop
+				Methods.AoT_off(winTitle);
+			}
+			else
+			{
+				// Enable the AlwaysOnTop
+				Methods.AoT_on(winTitle);
+			}
+			e.Handled = true;
 		}
-
-	}
 
 		void TrayIcon_Click(object sender, EventArgs e)
 		{
@@ -223,22 +220,14 @@ namespace AlwaysOnTop
 
 		void AoT(object sender, EventArgs e)
 		{
-			//change the cursor
+			// Change the cursor
 			ChangeCursors();
 
-			//perform the magic
-			string winTitle = Methods.GetWindowTitle();
-			
+			// Perform the magic
 			RevertCursors();
-			string subTitle = "";
-			try { subTitle = winTitle.Substring(winTitle.Length - 14); }
-			catch (Exception ex)
-			{
-                MessageBox.Show(ex.ToString(), "An error occurred", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			}
-
-			bool isOnTop = false;
-			if (subTitle == " - AlwaysOnTop") isOnTop = true;
+			
+			var winTitle = Methods.GetWindowTitle();
+			var isOnTop = winTitle?.EndsWith(" - AlwaysOnTop") ?? false; 
 			if (isOnTop)
 			{
 				// Disable the AlwaysOnTop
