@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Net;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Microsoft.Win32;
-using Utilities;
 using System.Windows.Forms;
 using Octokit;
-using System.IO;
-using System.Threading;
-using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace AlwaysOnTop.Classes
 {
@@ -53,22 +49,21 @@ namespace AlwaysOnTop.Classes
 		/*********** END ***********************************/
 
 
-		public static String GetWindowTitle()
+		public static async Task<string> GetWindowTitle()
 		{
-			var i = 0;
-			while (i < 1)
+			const int nChars = 256;
+			var buff = new StringBuilder(nChars);
+			while (true)
 			{
-				const int nChars = 256;
-				var Buff = new StringBuilder(nChars);
-				var handle = GetForegroundWindow();
-
-				if (GetWindowText(handle, Buff, nChars) > 0)
+				if (GetWindowText(GetForegroundWindow(), buff, nChars) > 0)
 				{
-					return Buff.ToString();
+					return buff.ToString();
 				}
+
+				// Don't need loop to run as fast as it can. 300ms is enough
+				await Task.Delay(100);
 			}
-			return null;
-		} // GetWindowTitle()
+		}
 
 		public static void AoT_on(string title)
 		{
@@ -167,10 +162,8 @@ namespace AlwaysOnTop.Classes
                 var client = new GitHubClient(new ProductHeaderValue("AlwaysOnTop-Updater"));
                 var releases = client.Repository.Release.GetAll("jparnell8839", "AlwaysOnTop").Result;
                 var latest = releases[0];
-                var assets = latest.Assets;
-                
 
-                if (latest.TagName != AlwaysOnTop.version)
+	            if (latest.TagName != AlwaysOnTop.version)
                 {
                     var downloadUpdate = MessageBox.Show("You have " + AlwaysOnTop.version + " installed." + Environment.NewLine
                         + "The latest release is " + latest.TagName + Environment.NewLine

@@ -184,14 +184,14 @@ namespace AlwaysOnTop
 			set { gkh = value; }
 		}
 
-		void keyup_hook(object sender, KeyEventArgs e)
+		async void keyup_hook(object sender, KeyEventArgs e)
 		{
 			if (e.Modifiers != kMod || e.KeyCode != key)
 			{
 				return;
 			}
 
-			var winTitle = Methods.GetWindowTitle();
+			var winTitle = await Methods.GetWindowTitle();
 			if (DBN != 1)
 			{
 				trayIcon.ShowBalloonTip(500, "AlwaysOnTop", "Running AlwaysOnTop on " + winTitle, ToolTipIcon.Info);
@@ -218,14 +218,13 @@ namespace AlwaysOnTop
 			mi?.Invoke(trayIcon, null);
 		}
 
-		void AoT(object sender, EventArgs e)
+		async void AoT(object sender, EventArgs e)
 		{
-			// Change the cursor
 			ChangeCursors();
 
 			try
 			{
-				var winTitle = Methods.GetWindowTitle();
+				var winTitle = await Methods.GetWindowTitle();
 
 				var isOnTop = winTitle?.EndsWith(" - AlwaysOnTop") ?? false; 
 				if (isOnTop)
@@ -241,7 +240,6 @@ namespace AlwaysOnTop
 			}
 			finally
 			{
-				// Perform the magic
 				RevertCursors();
 			}
 		}
@@ -291,6 +289,4 @@ namespace AlwaysOnTop
 			Application.Exit();
 		}
 	}
-
-	
 }
