@@ -223,20 +223,26 @@ namespace AlwaysOnTop
 			// Change the cursor
 			ChangeCursors();
 
-			// Perform the magic
-			RevertCursors();
-			
-			var winTitle = Methods.GetWindowTitle();
-			var isOnTop = winTitle?.EndsWith(" - AlwaysOnTop") ?? false; 
-			if (isOnTop)
+			try
 			{
-				// Disable the AlwaysOnTop
-				Methods.AoT_off(winTitle);
+				var winTitle = Methods.GetWindowTitle();
+
+				var isOnTop = winTitle?.EndsWith(" - AlwaysOnTop") ?? false; 
+				if (isOnTop)
+				{
+					// Disable the AlwaysOnTop
+					Methods.AoT_off(winTitle);
+				}
+				else
+				{
+					// Enable the AlwaysOnTop
+					Methods.AoT_on(winTitle);
+				}
 			}
-			else
+			finally
 			{
-				// Enable the AlwaysOnTop
-				Methods.AoT_on(winTitle);
+				// Perform the magic
+				RevertCursors();
 			}
 		}
 
