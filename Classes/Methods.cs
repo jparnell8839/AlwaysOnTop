@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Net;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using Microsoft.Win32;
-using Utilities;
 using System.Windows.Forms;
 using Octokit;
-using System.IO;
-using System.Threading;
-using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace AlwaysOnTop.Classes
 {
@@ -53,36 +49,35 @@ namespace AlwaysOnTop.Classes
 		/*********** END ***********************************/
 
 
-		public static String GetWindowTitle()
+		public static async Task<string> GetWindowTitle()
 		{
-			int i = 0;
-			while (i < 1)
+			const int nChars = 256;
+			var buff = new StringBuilder(nChars);
+			while (true)
 			{
-				const int nChars = 256;
-				StringBuilder Buff = new StringBuilder(nChars);
-				IntPtr handle = GetForegroundWindow();
-
-				if (GetWindowText(handle, Buff, nChars) > 0)
+				if (GetWindowText(GetForegroundWindow(), buff, nChars) > 0)
 				{
-					return Buff.ToString();
+					return buff.ToString();
 				}
+
+				// Don't need loop to run as fast as it can.
+				await Task.Delay(100);
 			}
-			return null;
-		} // GetWindowTitle()
+		}
 
 		public static void AoT_on(string title)
 		{
-			Process[] processes = Process.GetProcesses(".");
+			var processes = Process.GetProcesses(".");
 			foreach (var process in processes)
 			{
-				string mWinTitle = process.MainWindowTitle.ToString();
+				var mWinTitle = process.MainWindowTitle.ToString();
 				if (mWinTitle == title)
 				{
-					IntPtr handle = process.MainWindowHandle;
+					var handle = process.MainWindowHandle;
 					if (handle != IntPtr.Zero)
 					{
 						SetWindowPos(handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-						string newTitle = title + " - AlwaysOnTop";
+						var newTitle = title + " - AlwaysOnTop";
 						SetWindowText(handle, newTitle);
 					}
 				}
@@ -92,17 +87,17 @@ namespace AlwaysOnTop.Classes
 
 		public static void AoT_off(string title)
 		{
-			Process[] processes = Process.GetProcesses(".");
+			var processes = Process.GetProcesses(".");
 			foreach (var process in processes)
 			{
-				string mWinTitle = process.MainWindowTitle.ToString();
+				var mWinTitle = process.MainWindowTitle.ToString();
 				if ( mWinTitle == title)
 				{
-					IntPtr handle = process.MainWindowHandle;
+					var handle = process.MainWindowHandle;
 					if (handle != IntPtr.Zero)
 					{
 						SetWindowPos(handle, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-						string newTitle = title.Substring(0,title.Length - 14);
+						var newTitle = title.Substring(0,title.Length - 14);
 						SetWindowText(handle, newTitle);
 					}
 				}
@@ -166,13 +161,11 @@ namespace AlwaysOnTop.Classes
             {
                 var client = new GitHubClient(new ProductHeaderValue("AlwaysOnTop-Updater"));
                 var releases = client.Repository.Release.GetAll("jparnell8839", "AlwaysOnTop").Result;
-                Release latest = releases[0];
-                var assets = latest.Assets;
-                
+                var latest = releases[0];
 
-                if (latest.TagName != AlwaysOnTop.version)
+	            if (latest.TagName != AlwaysOnTop.version)
                 {
-                    DialogResult downloadUpdate = MessageBox.Show("You have " + AlwaysOnTop.version + " installed." + Environment.NewLine
+                    var downloadUpdate = MessageBox.Show("You have " + AlwaysOnTop.version + " installed." + Environment.NewLine
                         + "The latest release is " + latest.TagName + Environment.NewLine
                         + Environment.NewLine
                         + "Would you like to download the newest update?",
@@ -183,7 +176,7 @@ namespace AlwaysOnTop.Classes
                     if(downloadUpdate == DialogResult.Yes)
                     {
                         //MessageBox.Show(latest);
-                        FormUpdate update = new FormUpdate(latest);
+                        var update = new FormUpdate(latest);
                         update.ShowDialog();
                     }
                 }

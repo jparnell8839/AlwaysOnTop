@@ -36,7 +36,7 @@ namespace AlwaysOnTop
 		[STAThread]
 		static void Main(string[] args)
 		{
-			string path = AppDomain.CurrentDomain.BaseDirectory + "\\AoT_Error.log";
+			var path = AppDomain.CurrentDomain.BaseDirectory + "\\AoT_Error.log";
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			try
@@ -45,7 +45,7 @@ namespace AlwaysOnTop
 			}
 			catch(Exception ex)
 			{
-				using (StreamWriter error = new StreamWriter(path, true))
+				using (var error = new StreamWriter(path, true))
 				{
 					error.WriteLine(DateTime.Now + ": " + ex.Message);
 				}
