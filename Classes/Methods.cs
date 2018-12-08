@@ -60,7 +60,7 @@ namespace AlwaysOnTop.Classes
 					return buff.ToString();
 				}
 
-				// Don't need loop to run as fast as it can. 300ms is enough
+				// Don't need loop to run as fast as it can.
 				await Task.Delay(100);
 			}
 		}
